@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributor ROI Calculator – Jio</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --jio-blue: #003087;
+    --jio-red: #E8192C;
+    --jio-teal: #00B5B8;
+    --jio-gold: #F5A623;
+    --bg: #F0F4FA;
+    --card: #FFFFFF;
+    --border: #D8E3F3;
+    --text: #1A2340;
+    --muted: #6B7A99;
+    --green: #00A878;
+    --red-light: #FFF0F1;
+    --green-light: #F0FBF7;
+    --shadow: 0 4px 24px rgba(0,48,135,0.10);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--jio-blue) 0%, #001A5C 100%);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo-jio {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -1px;
+  }
+  .logo-jio span { color: var(--jio-red); }
+  .logo-divider {
+    width: 2px; height: 32px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+  }
+  .logo-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  /* HERO BAND */
+  .hero {
+    background: linear-gradient(90deg, var(--jio-blue) 0%, #0055CC 100%);
+    padding: 28px 32px 0;
+    color: white;
+  }
+  .hero h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .hero p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 4px;
+  }
+
+  /* LIVE ROI TICKER — sits at bottom of hero */
+  .roi-ticker {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    overflow-x: auto;
+    padding-bottom: 0;
+  }
+  .ticker-card {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(8px);
+    border-radius: 14px 14px 0 0;
+    padding: 16px 24px 20px;
+    min-width: 160px;
+    flex: 1;
+    text-align: center;
+  }
+  .ticker-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+  }
+  .ticker-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 4px;
+    transition: all 0.4s ease;
+  }
+  .ticker-value.positive { color: #5DFFB9; }
+  .ticker-value.negative { color: #FF8A94; }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 24px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .icon-green { background: #E8FBF5; }
+  .icon-red   { background: #FFF0F1; }
+  .icon-blue  { background: #EEF4FF; }
+  .icon-gold  { background: #FFF8E8; }
+  .card-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .card-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .card-body { padding: 18px 24px 22px; }
+
+  /* FORM ROWS */
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #F0F4FA;
+  }
+  .form-row:last-child { border-bottom: none; }
+  .row-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--bg);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .row-label {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .row-hint {
+    font-size: 10.5px;
+    color: var(--muted);
+    margin-top: 1px;
+    font-weight: 400;
+  }
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .num-input, .amt-input {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: var(--text);
+    background: #FAFCFF;
+    transition: border 0.2s, box-shadow 0.2s;
+    outline: none;
+    text-align: right;
+  }
+  .num-input { width: 66px; }
+  .amt-input { width: 100px; }
+  .num-input:focus, .amt-input:focus {
+    border-color: var(--jio-teal);
+    box-shadow: 0 0 0 3px rgba(0,181,184,0.12);
+    background: #fff;
+  }
+  .calc-badge {
+    font-size: 11px;
+    color: var(--jio-blue);
+    background: #EEF4FF;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: 600;
+    min-width: 72px;
+    text-align: right;
+  }
+
+  /* SALARY INPUTS */
+  .salary-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #F0F4FA;
+  }
+  .salary-row:last-child { border-bottom: none; }
+
+  /* INVESTMENT SECTION – full width */
+  .full-width { grid-column: 1 / -1; }
+
+  /* FIXED EXPENSES TABLE */
+  .fixed-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .fixed-table th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 6px 0 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fixed-table td {
+    padding: 9px 0;
+    border-bottom: 1px solid #F0F4FA;
+  }
+  .fixed-table tr:last-child td { border-bottom: none; }
+  .fixed-tag {
+    background: #F0FBF7;
+    color: var(--green);
+    font-size: 10.5px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 7px;
+  }
+
+  /* INVESTMENT ROWS */
+  .inv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 32px;
+  }
+  .inv-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #F0F4FA;
+  }
+
+  /* ROI SUMMARY */
+  .roi-summary {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, var(--jio-blue) 0%, #001A5C 100%);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,48,135,0.25);
+    color: white;
+  }
+  .roi-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .roi-cell {
+    padding: 28px 28px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+  }
+  .roi-cell:last-child { border-right: none; }
+  .roi-cell-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+  }
+  .roi-cell-value {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-top: 6px;
+    transition: all 0.4s ease;
+  }
+  .roi-cell-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+  }
+  .roi-verdict {
+    background: rgba(0,0,0,0.2);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .verdict-text {
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+  }
+  .verdict-text strong { color: white; }
+  .verdict-pill {
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.5px;
+  }
+  .pill-good { background: var(--green); color: white; }
+  .pill-bad  { background: var(--jio-red); color: white; }
+  .pill-ok   { background: var(--jio-gold); color: var(--text); }
+
+  /* ACTIONS */
+  .actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .btn-primary {
+    background: var(--jio-red);
+    color: white;
+    box-shadow: 0 4px 16px rgba(232,25,44,0.3);
+  }
+  .btn-primary:hover { background: #C90F22; transform: translateY(-1px); }
+  .btn-secondary {
+    background: white;
+    color: var(--jio-blue);
+    border: 1.5px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--jio-blue); background: #EEF4FF; }
+  .btn-teal {
+    background: var(--jio-teal);
+    color: white;
+    box-shadow: 0 4px 16px rgba(0,181,184,0.3);
+  }
+  .btn-teal:hover { background: #009EA1; transform: translateY(-1px); }
+
+  /* SECTION TOTAL */
+  .section-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    margin-top: 14px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .section-total span:last-child {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    color: var(--jio-blue);
+  }
+
+  /* PRINT STYLES */
+  @media print {
+    header, .actions { display: none; }
+    .main { grid-template-columns: 1fr 1fr; }
+    body { background: white; }
+    .card { box-shadow: none; border: 1px solid #ddd; }
+  }
+
+  /* MOBILE */
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; padding: 16px 12px 40px; }
+    .roi-top { grid-template-columns: 1fr 1fr; }
+    .inv-grid { grid-template-columns: 1fr; }
+    header { padding: 0 16px; }
+    .hero { padding: 20px 16px 0; }
+    .roi-ticker { padding: 0 16px; }
+    .ticker-card { min-width: 130px; }
+    .full-width { grid-column: 1; }
+    .roi-summary { grid-column: 1; }
+    .actions { grid-column: 1; }
+  }
+
+  /* PULSE ANIMATION */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+  .live-dot {
+    width: 8px; height: 8px;
+    background: #5DFFB9;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-jio">J<span>io</span></div>
+    <div class="logo-divider"></div>
+    <div class="logo-sub">Distributor ROI Calculator</div>
+  </div>
+  <div class="header-badge"><span class="live-dot"></span>Live Calculation</div>
+</header>
+
+<!-- HERO + TICKER -->
+<div class="hero">
+  <h1>Distributor ROI Calculator</h1>
+  <p>Enter your monthly figures — ROI updates instantly</p>
+  <div class="roi-ticker">
+    <div class="ticker-card">
+      <div class="ticker-label">Gross Profit</div>
+      <div class="ticker-value" id="t-gp">₹0</div>
+    </div>
+    <div class="ticker-card">
+      <div class="ticker-label">Total Expenses</div>
+      <div class="ticker-value" id="t-exp">₹6,000</div>
+    </div>
+    <div class="ticker-card">
+      <div class="ticker-label">Net Profit/Month</div>
+      <div class="ticker-value" id="t-np">₹-6,000</div>
+    </div>
+    <div class="ticker-card">
+      <div class="ticker-label">ROI (Annual)</div>
+      <div class="ticker-value" id="t-roi">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- GROSS PROFIT CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-green">💰</div>
+      <div>
+        <div class="card-title">Gross Profit</div>
+        <div class="card-subtitle">Revenue sources & payouts</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- 1 Recharge -->
+      <div class="form-row">
+        <div class="row-num">1</div>
+        <div style="flex:1">
+          <div class="row-label">Recharge (Tertiary MRP)</div>
+          <div class="row-hint">Enter MRP value</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp1" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 2 Handset -->
+      <div class="form-row">
+        <div class="row-num">2</div>
+        <div style="flex:1">
+          <div class="row-label">Handset Sale</div>
+          <div class="row-hint">Nos. × ₹150 comm.</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="gp2n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="gp2b">₹0</span>
+        </div>
+      </div>
+
+      <!-- 3 Smart SIM -->
+      <div class="form-row">
+        <div class="row-num">3</div>
+        <div style="flex:1">
+          <div class="row-label">Smart SIM Activation</div>
+          <div class="row-hint">Nos. × ₹20 payout</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="gp3n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="gp3b">₹0</span>
+        </div>
+      </div>
+
+      <!-- 4 Jio Bharat -->
+      <div class="form-row">
+        <div class="row-num">4</div>
+        <div style="flex:1">
+          <div class="row-label">Jio Bharat SIM</div>
+          <div class="row-hint">Nos. × ₹15 payout</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="gp4n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="gp4b">₹0</span>
+        </div>
+      </div>
+
+      <!-- 5 PLC -->
+      <div class="form-row">
+        <div class="row-num">5</div>
+        <div style="flex:1">
+          <div class="row-label">PLC Payout</div>
+          <div class="row-hint">Enter amount directly (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp5" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 6 Smartphone MNP Growth -->
+      <div class="form-row">
+        <div class="row-num">6</div>
+        <div style="flex:1">
+          <div class="row-label">Smartphone MNP Growth</div>
+          <div class="row-hint">Enter payout amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp6" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 7 MNP Contribution Comm -->
+      <div class="form-row">
+        <div class="row-num">7</div>
+        <div style="flex:1">
+          <div class="row-label">MNP Contribution Comm</div>
+          <div class="row-hint">Enter payout amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp7" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 8 Airfiber Booking -->
+      <div class="form-row">
+        <div class="row-num">8</div>
+        <div style="flex:1">
+          <div class="row-label">Airfiber Booking by Retailer</div>
+          <div class="row-hint">Nos. × ₹100 payout</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="gp8n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="gp8b">₹0</span>
+        </div>
+      </div>
+
+      <!-- 9 SKY Starter -->
+      <div class="form-row">
+        <div class="row-num">9</div>
+        <div style="flex:1">
+          <div class="row-label">SKY Starter Pack</div>
+          <div class="row-hint">Nos. × ₹50 payout</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="gp9n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="gp9b">₹0</span>
+        </div>
+      </div>
+
+      <!-- 10 WA SKYC -->
+      <div class="form-row">
+        <div class="row-num">10</div>
+        <div style="flex:1">
+          <div class="row-label">WA Assisted SKYC</div>
+          <div class="row-hint">Nos. × ₹30 payout</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="gp10n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="gp10b">₹0</span>
+        </div>
+      </div>
+
+      <!-- 11 AF Installation Payout -->
+      <div class="form-row">
+        <div class="row-num">11</div>
+        <div style="flex:1">
+          <div class="row-label">AF Installation Payout</div>
+          <div class="row-hint">Enter amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp11" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 12 AF Installation PLI -->
+      <div class="form-row">
+        <div class="row-num">12</div>
+        <div style="flex:1">
+          <div class="row-label">AF Installation PLI</div>
+          <div class="row-hint">Enter amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp12" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 13 Direct ORN -->
+      <div class="form-row">
+        <div class="row-num">13</div>
+        <div style="flex:1">
+          <div class="row-label">Direct ORN</div>
+          <div class="row-hint">Enter amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp13" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 14a Book to ORN -->
+      <div class="form-row">
+        <div class="row-num">14</div>
+        <div style="flex:1">
+          <div class="row-label">Book to ORN</div>
+          <div class="row-hint">Enter amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp14a" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <!-- 14b RED ODU -->
+      <div class="form-row">
+        <div class="row-num">15</div>
+        <div style="flex:1">
+          <div class="row-label">RED ODU</div>
+          <div class="row-hint">Enter amount (₹)</div>
+        </div>
+        <div class="input-group">
+          <span style="font-size:12px;color:var(--muted)">₹</span>
+          <input class="amt-input" type="number" id="gp14b" value="0" min="0" oninput="calc()">
+        </div>
+      </div>
+
+      <div class="section-total">
+        <span>Total Gross Profit</span>
+        <span id="total-gp">₹0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPENSES CARD -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-red">📊</div>
+      <div>
+        <div class="card-title">Expenses</div>
+        <div class="card-subtitle">Monthly operational costs</div>
+      </div>
+    </div>
+    <div class="card-body">
+
+      <!-- FSE Salary -->
+      <div class="salary-row">
+        <div class="row-num">1</div>
+        <div style="flex:1">
+          <div class="row-label">FSE Salary</div>
+          <div class="row-hint">Nos. × ₹12,000/month</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="exp1n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="exp1b">₹0</span>
+        </div>
+      </div>
+
+      <!-- DAB Salary -->
+      <div class="salary-row">
+        <div class="row-num">2</div>
+        <div style="flex:1">
+          <div class="row-label">DAB Salary</div>
+          <div class="row-hint">Nos. × ₹15,000/month</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="exp2n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="exp2b">₹0</span>
+        </div>
+      </div>
+
+      <!-- SA Salary -->
+      <div class="salary-row">
+        <div class="row-num">3</div>
+        <div style="flex:1">
+          <div class="row-label">SA Salary</div>
+          <div class="row-hint">Nos. × ₹12,000/month</div>
+        </div>
+        <div class="input-group">
+          <input class="num-input" type="number" id="exp3n" value="0" min="0" placeholder="Nos" oninput="calc()">
+          <span class="calc-badge" id="exp3b">₹0</span>
+        </div>
+      </div>
+
+      <!-- Fixed Expenses -->
+      <div style="margin-top:16px">
+        <table class="fixed-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Head</th>
+              <th style="text-align:right">Amount</th>
+              <th style="text-align:right">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--muted)">4</td>
+              <td>Stationery</td>
+              <td style="text-align:right;font-weight:600">₹1,000</td>
+              <td style="text-align:right"><span class="fixed-tag">Fixed</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted)">5</td>
+              <td>Office Rent</td>
+              <td style="text-align:right;font-weight:600">₹3,000</td>
+              <td style="text-align:right"><span class="fixed-tag">Fixed</span></td>
+            </tr>
+            <tr>
+              <td style="color:var(--muted)">6</td>
+              <td>Miscellaneous</td>
+              <td style="text-align:right;font-weight:600">₹2,000</td>
+              <td style="text-align:right"><span class="fixed-tag">Fixed</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-total">
+        <span>Total Expenses</span>
+        <span id="total-exp" style="color:var(--jio-red)">₹6,000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVESTMENT CARD -->
+  <div class="card full-width">
+    <div class="card-header">
+      <div class="card-icon icon-blue">🏦</div>
+      <div>
+        <div class="card-title">Investment (Working Capital)</div>
+        <div class="card-subtitle">Validate from distributor's books of accounts</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="inv-grid">
+        <div class="inv-row">
+          <div>
+            <div class="row-label">Stocks</div>
+            <div class="row-hint">Current stock value</div>
+          </div>
+          <div class="input-group">
+            <span style="font-size:12px;color:var(--muted)">₹</span>
+            <input class="amt-input" type="number" id="inv1" value="0" min="0" oninput="calc()" style="width:120px">
+          </div>
+        </div>
+        <div class="inv-row">
+          <div>
+            <div class="row-label">Claims</div>
+            <div class="row-hint">Outstanding claims</div>
+          </div>
+          <div class="input-group">
+            <span style="font-size:12px;color:var(--muted)">₹</span>
+            <input class="amt-input" type="number" id="inv2" value="0" min="0" oninput="calc()" style="width:120px">
+          </div>
+        </div>
+        <div class="inv-row">
+          <div>
+            <div class="row-label">Security Deposit (SD)</div>
+            <div class="row-hint">SD with company</div>
+          </div>
+          <div class="input-group">
+            <span style="font-size:12px;color:var(--muted)">₹</span>
+            <input class="amt-input" type="number" id="inv3" value="0" min="0" oninput="calc()" style="width:120px">
+          </div>
+        </div>
+        <div class="inv-row">
+          <div>
+            <div class="row-label">Market Credit</div>
+            <div class="row-hint">Credit extended to retailers</div>
+          </div>
+          <div class="input-group">
+            <span style="font-size:12px;color:var(--muted)">₹</span>
+            <input class="amt-input" type="number" id="inv4" value="0" min="0" oninput="calc()" style="width:120px">
+          </div>
+        </div>
+      </div>
+      <div class="section-total">
+        <span>Total Investment</span>
+        <span id="total-inv" style="color:var(--jio-blue)">₹0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROI SUMMARY CARD -->
+  <div class="roi-summary">
+    <div class="roi-top">
+      <div class="roi-cell">
+        <div class="roi-cell-label">Gross Profit / Month</div>
+        <div class="roi-cell-value" id="sum-gp">₹0</div>
+        <div class="roi-cell-sub">Per Annum: <span id="sum-gp-pa">₹0</span></div>
+      </div>
+      <div class="roi-cell">
+        <div class="roi-cell-label">Expenses / Month</div>
+        <div class="roi-cell-value" id="sum-exp">₹6,000</div>
+        <div class="roi-cell-sub">Per Annum: <span id="sum-exp-pa">₹72,000</span></div>
+      </div>
+      <div class="roi-cell">
+        <div class="roi-cell-label">Net Profit / Month</div>
+        <div class="roi-cell-value" id="sum-np">₹-6,000</div>
+        <div class="roi-cell-sub">Per Annum: <span id="sum-np-pa">₹-72,000</span></div>
+      </div>
+      <div class="roi-cell">
+        <div class="roi-cell-label">ROI (Annual)</div>
+        <div class="roi-cell-value positive" id="sum-roi">—</div>
+        <div class="roi-cell-sub">Investment: <span id="sum-inv">₹0</span></div>
+      </div>
+    </div>
+    <div class="roi-verdict">
+      <div class="verdict-text" id="verdict-text">Enter your figures above to see the ROI verdict.</div>
+      <div class="verdict-pill pill-ok" id="verdict-pill">PENDING</div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset All</button>
+    <button class="btn btn-teal" onclick="window.print()">🖨️ Print / Save PDF</button>
+    <button class="btn btn-primary" onclick="shareLink()">🔗 Copy Shareable Link</button>
+  </div>
+
+</div>
+
+<script>
+// Per-unit rates (can be adjusted)
+const RATES = {
+  handset: 150,
+  smartSim: 20,
+  jioBharat: 15,
+  airfiber: 100,
+  sky: 50,
+  waSkyc: 30,
+  fse: 12000,
+  dab: 15000,
+  sa: 12000,
+};
+const FIXED_EXP = 6000; // Stationery+Rent+Misc
+
+function v(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n) {
+  const sign = n < 0 ? '-' : '';
+  return sign + '₹' + Math.abs(Math.round(n)).toLocaleString('en-IN');
+}
+function setEl(id, text, cls) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.textContent = text;
+    if (cls) { el.className = el.className.replace(/positive|negative/g,'').trim(); el.classList.add(cls); }
+  }
+}
+
+function calc() {
+  // Gross Profit calculations
+  const handsetAmt = v('gp2n') * RATES.handset;
+  const smartSimAmt = v('gp3n') * RATES.smartSim;
+  const jioBharatAmt = v('gp4n') * RATES.jioBharat;
+  const airfiberAmt = v('gp8n') * RATES.airfiber;
+  const skyAmt = v('gp9n') * RATES.sky;
+  const waSkycAmt = v('gp10n') * RATES.waSkyc;
+
+  // Update badges
+  setEl('gp2b', fmt(handsetAmt));
+  setEl('gp3b', fmt(smartSimAmt));
+  setEl('gp4b', fmt(jioBharatAmt));
+  setEl('gp8b', fmt(airfiberAmt));
+  setEl('gp9b', fmt(skyAmt));
+  setEl('gp10b', fmt(waSkycAmt));
+
+  const grossProfit =
+    v('gp1') + handsetAmt + smartSimAmt + jioBharatAmt +
+    v('gp5') + v('gp6') + v('gp7') +
+    airfiberAmt + skyAmt + waSkycAmt +
+    v('gp11') + v('gp12') + v('gp13') + v('gp14a') + v('gp14b');
+
+  // Expenses
+  const fseAmt = v('exp1n') * RATES.fse;
+  const dabAmt = v('exp2n') * RATES.dab;
+  const saAmt = v('exp3n') * RATES.sa;
+  setEl('exp1b', fmt(fseAmt));
+  setEl('exp2b', fmt(dabAmt));
+  setEl('exp3b', fmt(saAmt));
+
+  const totalExp = fseAmt + dabAmt + saAmt + FIXED_EXP;
+
+  // Investment
+  const totalInv = v('inv1') + v('inv2') + v('inv3') + v('inv4');
+
+  // Net Profit
+  const netProfit = grossProfit - totalExp;
+  const netPA = netProfit * 12;
+  const roiPA = totalInv > 0 ? (netPA / totalInv) * 100 : null;
+
+  // Update section totals
+  setEl('total-gp', fmt(grossProfit));
+  setEl('total-exp', fmt(totalExp));
+  setEl('total-inv', fmt(totalInv));
+
+  // Ticker
+  setEl('t-gp', fmt(grossProfit), grossProfit >= 0 ? 'positive' : 'negative');
+  setEl('t-exp', fmt(totalExp));
+  setEl('t-np', fmt(netProfit), netProfit >= 0 ? 'positive' : 'negative');
+  setEl('t-roi', roiPA !== null ? roiPA.toFixed(1) + '%' : '—', roiPA > 15 ? 'positive' : roiPA !== null && roiPA < 0 ? 'negative' : '');
+
+  // Summary
+  setEl('sum-gp', fmt(grossProfit));
+  setEl('sum-gp-pa', fmt(grossProfit * 12));
+  setEl('sum-exp', fmt(totalExp));
+  setEl('sum-exp-pa', fmt(totalExp * 12));
+  setEl('sum-np', fmt(netProfit), netProfit >= 0 ? 'positive' : 'negative');
+  setEl('sum-np-pa', fmt(netPA));
+  setEl('sum-roi', roiPA !== null ? roiPA.toFixed(2) + '%' : '—', roiPA > 15 ? 'positive' : roiPA !== null && roiPA < 0 ? 'negative' : '');
+  setEl('sum-inv', fmt(totalInv));
+
+  // Verdict
+  const pillEl = document.getElementById('verdict-pill');
+  const textEl = document.getElementById('verdict-text');
+  if (roiPA === null) {
+    pillEl.className = 'verdict-pill pill-ok'; pillEl.textContent = 'PENDING';
+    textEl.innerHTML = 'Enter investment amount to compute ROI.';
+  } else if (roiPA >= 30) {
+    pillEl.className = 'verdict-pill pill-good'; pillEl.textContent = '✅ EXCELLENT';
+    textEl.innerHTML = `<strong>Strong ROI!</strong> Annual return of ${roiPA.toFixed(1)}% is well above benchmark. Net profit ₹${Math.round(netPA).toLocaleString('en-IN')}/year.`;
+  } else if (roiPA >= 15) {
+    pillEl.className = 'verdict-pill pill-good'; pillEl.textContent = '✅ GOOD';
+    textEl.innerHTML = `<strong>Healthy ROI.</strong> ${roiPA.toFixed(1)}% annual return is acceptable. Net profit ₹${Math.round(netPA).toLocaleString('en-IN')}/year.`;
+  } else if (roiPA >= 0) {
+    pillEl.className = 'verdict-pill pill-ok'; pillEl.textContent = '⚠️ MARGINAL';
+    textEl.innerHTML = `<strong>Low ROI of ${roiPA.toFixed(1)}%.</strong> Consider increasing revenue streams or reducing expenses. Net profit: ₹${Math.round(netPA).toLocaleString('en-IN')}/year.`;
+  } else {
+    pillEl.className = 'verdict-pill pill-bad'; pillEl.textContent = '❌ LOSS';
+    textEl.innerHTML = `<strong>Net Loss of ₹${Math.abs(Math.round(netPA)).toLocaleString('en-IN')}/year.</strong> Urgently review expenses and boost revenue across all channels.`;
+  }
+
+  // Save to URL
+  saveToUrl();
+}
+
+// URL-based persistence for shareable links
+function saveToUrl() {
+  const ids = ['gp1','gp2n','gp3n','gp4n','gp5','gp6','gp7','gp8n','gp9n','gp10n','gp11','gp12','gp13','gp14a','gp14b','exp1n','exp2n','exp3n','inv1','inv2','inv3','inv4'];
+  const params = new URLSearchParams();
+  ids.forEach(id => { const val = v(id); if (val) params.set(id, val); });
+  const newUrl = window.location.pathname + '?' + params.toString();
+  window.history.replaceState(null, '', newUrl);
+}
+
+function loadFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  params.forEach((val, key) => {
+    const el = document.getElementById(key);
+    if (el) el.value = val;
+  });
+  calc();
+}
+
+function resetAll() {
+  const ids = ['gp1','gp2n','gp3n','gp4n','gp5','gp6','gp7','gp8n','gp9n','gp10n','gp11','gp12','gp13','gp14a','gp14b','exp1n','exp2n','exp3n','inv1','inv2','inv3','inv4'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
+  window.history.replaceState(null, '', window.location.pathname);
+  calc();
+}
+
+function shareLink() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = event.target.closest('.btn');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ Link Copied!';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+  }).catch(() => {
+    prompt('Copy this link:', url);
+  });
+}
+
+// Init
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.location.search) {
+    loadFromUrl();
+  } else {
+    calc();
+  }
+});
+</script>
+</body>
+</html>
